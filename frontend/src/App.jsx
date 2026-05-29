@@ -195,10 +195,10 @@ const EMPTY_STATES = {
       `@${u}, you call THIS a profile?! There's NOTHING on the menu! An EMPTY kitchen, not a single repo to serve! You expect me to roast a plate of fresh AIR?! Get OUT of my restaurant, you donkey!`,
   },
   influencer: {
-    emoji: '📈',
-    title: 'A greenfield of pure potential',
+    emoji: '📉',
+    title: 'We need to talk about this profile',
     message: (u) =>
-      `Honestly? @${u} having zero public repos is the most disruptive move I've seen all week. 🚀 No legacy code, no technical debt, infinite runway — most people see an empty profile, but visionaries see a pre-seed opportunity.\nAgree?`,
+      `I'm not gonna lie, @${u} — zero public repos is wild. 🙃 Everyone's out here shipping and you've got... an empty profile and a dream. "Building in stealth" isn't a personality, and a blank GitHub isn't a brand. Respectfully, do better.\nMake it make sense.`,
   },
 }
 

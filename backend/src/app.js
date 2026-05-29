@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import roastRoutes from "./routes/roastRoutes.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
@@ -17,5 +18,8 @@ app.use("/api", roastRoutes);
 app.use((_req, res) => {
   res.status(404).json({ error: "Not found" });
 });
+
+// Centralized error handler (handles the Gemini 429 rate limit, etc.).
+app.use(errorHandler);
 
 export default app;

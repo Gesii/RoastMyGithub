@@ -1,7 +1,7 @@
 import { fetchGitHubProfile } from "../services/githubService.js";
 import { generateRoast, ROAST_STYLE_KEYS } from "../services/roastService.js";
 
-export async function roastUser(req, res) {
+export async function roastUser(req, res, next) {
   const { username, style } = req.body ?? {};
 
   if (!username || typeof username !== "string" || !username.trim()) {
@@ -16,6 +16,18 @@ export async function roastUser(req, res) {
 
     console.log(`[roast] Fetched GitHub payload for "${payload.username}" (${payload.publicRepos} repos)`);
 
+    // No public repos: nothing to roast. Skip the Gemini call and let the
+    // frontend render its empty state immediately.
+    if (payload.repositories.length === 0) {
+      console.log(`[roast] "${payload.username}" has no public repos; skipping roast.`);
+      return res.status(200).json({
+        username: payload.username,
+        style: selectedStyle,
+        roast: null,
+        profile: payload,
+      });
+    }
+
     const roast = await generateRoast(payload, selectedStyle);
 
     console.log(`[roast] Generated "${selectedStyle}" roast for "${payload.username}".`);
@@ -27,8 +39,8 @@ export async function roastUser(req, res) {
       profile: payload,
     });
   } catch (error) {
-    const status = error.status ?? 500;
     console.error(`[roast] Failed for "${username}":`, error.message);
-    return res.status(status).json({ error: error.message });
+    // Hand off to the centralized error middleware for the client response.
+    return next(error);
   }
 }

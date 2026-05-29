@@ -107,7 +107,21 @@ Roast this developer based on the following GitHub data:
 
 ${summary}`;
 
-  const result = await geminiModel.generateContent(prompt);
+  let result;
+  try {
+    result = await geminiModel.generateContent(prompt);
+  } catch (err) {
+    // Surface Gemini quota/rate-limit errors with a clean, user-facing message.
+    if (isGeminiRateLimit(err)) {
+      const error = new Error("Gemini rate limit exceeded");
+      error.status = 429;
+      error.clientMessage =
+        "The AI is overheated from all these terrible repos! Please wait a few seconds before roasting again.";
+      throw error;
+    }
+    throw err;
+  }
+
   const roast = result.response.text().trim();
 
   if (!roast) {
@@ -117,4 +131,11 @@ ${summary}`;
   }
 
   return roast;
+}
+
+// The @google/generative-ai SDK throws a fetch error carrying the HTTP status;
+// fall back to inspecting the message for environments where it's absent.
+export function isGeminiRateLimit(err) {
+  if (err?.status === 429) return true;
+  return /\b429\b|quota|rate limit|too many requests/i.test(err?.message ?? "");
 }

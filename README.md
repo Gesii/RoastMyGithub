@@ -1,7 +1,7 @@
 # Roast My GitHub
 
 A full-stack web app that fetches a user's public GitHub activity and roasts it
-with Google Gemini (`gemini-2.5-flash`) in one of four comedic styles.
+with Google Gemini (`gemini-2.5-flash`) in one of six comedic styles.
 
 - **Backend:** Node.js + Express (ES modules) — fetches GitHub data and generates roasts.
 - **Frontend:** React + Vite + Tailwind CSS — a themed UI that re-skins per roast style.
@@ -20,8 +20,9 @@ with Google Gemini (`gemini-2.5-flash`) in one of four comedic styles.
 ## Features
 
 - Roast any public GitHub user by username.
-- **Four roast styles:** Savage, Corporate Jargon, Pirate, and Haiku. The entire
-  UI (colors, fonts, gradient header, slogan) re-themes to match the chosen style.
+- **Six roast styles:** Savage, Corporate Jargon, Pirate, Haiku, Gordon Ramsay,
+  and LinkedIn Influencer. The entire UI (colors, fonts, gradient header, slogan)
+  re-themes to match the chosen style.
 - **Custom loading state:** randomized, cycling funny status messages.
 - **Distinct empty states:** friendly, per-style messages for non-existent users
   (404) and users with no public repositories.
@@ -111,7 +112,8 @@ Request:
 ```
 
 `style` is optional and must be one of `savage` (default), `corporate`, `pirate`,
-or `haiku`. Unknown/missing values fall back to `savage`.
+`haiku`, `chef` (Gordon Ramsay), or `influencer` (LinkedIn Influencer).
+Unknown/missing values fall back to `savage`.
 
 Response:
 

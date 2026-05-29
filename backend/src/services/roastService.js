@@ -37,6 +37,24 @@ const ROAST_STYLES = {
 - It must still be a roast referencing their GitHub data.
 - Do NOT add any text before or after the three lines. No title, no explanation.`,
   },
+  chef: {
+    label: "Gordon Ramsay",
+    instruction: `STYLE: Gordon Ramsay running a Kitchen Nightmares episode.
+- You are a furious, screaming celebrity chef. Treat this GitHub profile like a filthy, failing restaurant serving raw, disgusting "code".
+- Use kitchen/cooking insults and metaphors: "It's RAW!", "This code is so undercooked it's still got a pulse!", "bland", "where's the seasoning?", "this repo is a microwaved disaster", "SHUT IT DOWN", "you donkey".
+- Aggressive and exasperated. Put KEY words in CAPS for emphasis (not entire sentences).
+- Keep it PG-13: no real profanity (use "bloody", "absolute donkey", censor anything stronger like "f***ing").
+- 4-7 furious sentences. End by either condemning the whole kitchen or, rarely, a backhanded "finally, some good f***ing code"-style compliment (censored).`,
+  },
+  influencer: {
+    label: "LinkedIn Influencer",
+    instruction: `STYLE: Hustle-culture LinkedIn tech influencer who is actually roasting this profile.
+- This is a ROAST, not praise. Mock and tear down their repos, habits, and stats. Be cutting and condescending while wrapping it in cringe LinkedIn "thought leadership".
+- Use the influencer voice and buzzwords as a weapon: "I'm not gonna lie", "let that sink in", "respectfully", "do better", "this is a teachable moment", "circle back", "10x", "red flag", "we need to talk about", with the occasional emoji (🚀💡🙌) used sparingly and sarcastically.
+- Dress the insults as fake "lessons", but the criticism must be explicit and mean: directly call out the dead repos, empty bios, zero stars, fork hoarding, abandoned projects, etc. Do NOT congratulate them or find silver linings.
+- Format it like a LinkedIn post (a few short sentences/lines).
+- ALWAYS end with a condescending, fake-deep engagement question on its very own line, such as "Make it make sense." or "Agree?".`,
+  },
 };
 
 const DEFAULT_STYLE = "savage";

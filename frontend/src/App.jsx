@@ -5,6 +5,8 @@ const ROAST_STYLES = [
   { value: 'corporate', label: 'Corporate Jargon' },
   { value: 'pirate', label: 'Pirate' },
   { value: 'haiku', label: 'Haiku' },
+  { value: 'chef', label: 'Gordon Ramsay' },
+  { value: 'influencer', label: 'LinkedIn Influencer' },
 ]
 
 // Full, static Tailwind class strings per style so the JIT compiler detects them.
@@ -101,12 +103,65 @@ const THEMES = {
     accent: 'text-emerald-600',
     glow: 'bg-emerald-500/20',
   },
+  chef: {
+    emoji: '👨‍🍳',
+    tagline: 'It\u2019s RAW! Shut it down.',
+    page: 'bg-gradient-to-b from-zinc-950 via-neutral-900 to-red-950 text-zinc-100',
+    bodyFont: 'font-sans',
+    title: 'text-red-500 font-extrabold tracking-tight',
+    subtitle: 'text-zinc-400',
+    card: 'border border-red-700/50 bg-zinc-900/70 shadow-lg shadow-red-950/40',
+    input: 'border-zinc-700 bg-zinc-800/80 text-zinc-100 placeholder-zinc-500 focus:border-red-500 focus:ring-red-500/40',
+    select: 'border-zinc-700 bg-zinc-800/80 text-zinc-100 focus:border-red-500 focus:ring-red-500/40',
+    button: 'bg-red-700 hover:bg-red-600 text-white shadow-red-900/40',
+    roastText: 'text-zinc-100',
+    roastAlign: 'text-left',
+    loadingBox: 'border-red-700/50 bg-zinc-900/70 text-red-300',
+    spinner: 'border-red-500/30 border-t-red-500',
+    tag: 'border-red-700/50 bg-zinc-800/70 text-zinc-200 hover:border-red-500 hover:text-white',
+    ghostButton: 'text-zinc-400 hover:text-white',
+    titleGradient: 'from-rose-500 via-red-600 to-orange-500',
+    badge: 'border-red-500/30 bg-red-500/10 text-red-300',
+    badgeDot: 'bg-red-500',
+    accent: 'text-red-400',
+    glow: 'bg-red-600/25',
+  },
+  influencer: {
+    emoji: '🚀',
+    tagline: 'Grindset. Synergy. Value-add.',
+    page: 'bg-gradient-to-b from-sky-50 via-white to-indigo-50 text-slate-800',
+    bodyFont: 'font-sans',
+    title: 'text-sky-700 font-bold tracking-tight',
+    subtitle: 'text-slate-500',
+    card: 'border border-sky-200 bg-white shadow-sm',
+    input: 'border-sky-200 bg-white text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:ring-sky-500/30',
+    select: 'border-sky-200 bg-white text-slate-800 focus:border-sky-500 focus:ring-sky-500/30',
+    button: 'bg-sky-600 hover:bg-sky-500 text-white shadow-sky-200',
+    roastText: 'text-slate-700 leading-relaxed',
+    roastAlign: 'text-left',
+    loadingBox: 'border-sky-200 bg-white text-sky-700',
+    spinner: 'border-sky-500/30 border-t-sky-600',
+    tag: 'border-sky-200 bg-white text-slate-700 hover:border-sky-500 hover:text-sky-700',
+    ghostButton: 'text-slate-500 hover:text-sky-700',
+    titleGradient: 'from-sky-500 via-indigo-500 to-violet-500',
+    badge: 'border-sky-500/30 bg-sky-500/10 text-sky-700',
+    badgeDot: 'bg-sky-500',
+    accent: 'text-sky-600',
+    glow: 'bg-sky-500/20',
+  },
 }
 
 const STYLE_LABELS = Object.fromEntries(
   ROAST_STYLES.map((s) => [s.value, s.label]),
 )
-const STYLE_EMOJI = { savage: '🔥', corporate: '📊', pirate: '🏴‍☠️', haiku: '🍃' }
+const STYLE_EMOJI = {
+  savage: '🔥',
+  corporate: '📊',
+  pirate: '🏴‍☠️',
+  haiku: '🍃',
+  chef: '👨‍🍳',
+  influencer: '🚀',
+}
 
 // Style-specific copy for the "user exists but has no public repos" state.
 const EMPTY_STATES = {
@@ -132,6 +187,18 @@ const EMPTY_STATES = {
     emoji: '🍃',
     title: 'A haiku of nothing',
     message: (u) => `Bare branches, no code\n@${u} has planted nothing\nthe void roasts itself`,
+  },
+  chef: {
+    emoji: '🍽️',
+    title: 'WHERE\u2019S THE FOOD?!',
+    message: (u) =>
+      `@${u}, you call THIS a profile?! There's NOTHING on the menu! An EMPTY kitchen, not a single repo to serve! You expect me to roast a plate of fresh AIR?! Get OUT of my restaurant, you donkey!`,
+  },
+  influencer: {
+    emoji: '📈',
+    title: 'A greenfield of pure potential',
+    message: (u) =>
+      `Honestly? @${u} having zero public repos is the most disruptive move I've seen all week. 🚀 No legacy code, no technical debt, infinite runway — most people see an empty profile, but visionaries see a pre-seed opportunity.\nAgree?`,
   },
 }
 

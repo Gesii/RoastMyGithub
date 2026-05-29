@@ -1,47 +1,106 @@
 # Roast My GitHub
 
-A full-stack app that fetches a user's public GitHub activity and roasts it with Google Gemini.
+A full-stack web app that fetches a user's public GitHub activity and roasts it
+with Google Gemini (`gemini-2.5-flash`) in one of four comedic styles.
 
-## Backend
+- **Backend:** Node.js + Express (ES modules) — fetches GitHub data and generates roasts.
+- **Frontend:** React + Vite + Tailwind CSS — a themed UI that re-skins per roast style.
 
-Express server (ES modules) that exposes the roast API.
+> [!WARNING]
+> **Heads-up on the live demo / API limits.** This app currently runs on a
+> **free Google Gemini API key**, which has strict usage quotas. After a handful
+> of requests in a short window, Gemini returns a **429 rate-limit error** and
+> roasting will temporarily stop working. If you're testing the deployed
+> (Replit) URL and see *"The AI is overheated from all these terrible repos!
+> Please wait a few seconds before roasting again"*, that's the quota — just wait
+> a bit and try again. Previously generated roasts remain viewable from the
+> **Recent Roasts** history (they're cached locally), so they keep working even
+> while the quota is exhausted. For heavier use, swap in a paid Gemini key.
+
+## Features
+
+- Roast any public GitHub user by username.
+- **Four roast styles:** Savage, Corporate Jargon, Pirate, and Haiku. The entire
+  UI (colors, fonts, gradient header, slogan) re-themes to match the chosen style.
+- **Custom loading state:** randomized, cycling funny status messages.
+- **Distinct empty states:** friendly, per-style messages for non-existent users
+  (404) and users with no public repositories.
+- **Copy Roast** button and **Regenerate** for a fresh take.
+- **Recent Roasts** history (saved in `localStorage`) with cached responses —
+  click a tag to instantly re-display a past roast without another API call.
+- Graceful error handling, including a clean message for Gemini rate limits.
+
+## Project structure
 
 ```
-backend/
-├── src/
-│   ├── config/
-│   │   └── gemini.js          # @google/generative-ai client (gemini-2.5-flash)
-│   ├── controllers/
-│   │   └── roastController.js # Request handling + payload logging
-│   ├── routes/
-│   │   └── roastRoutes.js     # POST /api/roast
-│   ├── services/
-│   │   ├── githubService.js   # Fetches public GitHub profile + repos
-│   │   └── roastService.js    # Summarizes payload + generates roast via Gemini
-│   ├── app.js                 # Express app (middleware, routes)
-│   └── server.js              # Entry point
-├── .env.example
-└── package.json
+.
+├── backend/                   # Express API (+ serves the built frontend in prod)
+│   ├── src/
+│   │   ├── config/gemini.js          # @google/generative-ai client (gemini-2.5-flash)
+│   │   ├── controllers/roastController.js
+│   │   ├── middleware/errorHandler.js # Centralized errors (e.g. Gemini 429)
+│   │   ├── routes/roastRoutes.js      # POST /api/roast
+│   │   ├── services/githubService.js  # Fetches public GitHub profile + repos
+│   │   ├── services/roastService.js   # Builds the prompt + calls Gemini
+│   │   ├── loadEnv.js                 # Loads backend/.env (cwd-independent)
+│   │   ├── app.js                     # Express app, static serving, routes
+│   │   └── server.js                  # Entry point (binds 0.0.0.0)
+│   ├── .env.example
+│   └── package.json
+├── frontend/                  # React + Vite + Tailwind app
+│   ├── src/App.jsx            # Entire UI (themes, history, states)
+│   ├── vite.config.js         # Tailwind plugin + dev proxy to /api
+│   └── package.json
+├── package.json               # Root scripts for build/start (used by Replit)
+└── .replit                    # Replit run/deploy config
 ```
 
-### Setup
+## Local development
+
+Run the backend and frontend separately (the Vite dev server proxies `/api` to
+the backend, so you get hot reload on both).
+
+**1. Backend** (terminal 1):
 
 ```bash
 cd backend
 npm install
 cp .env.example .env   # then add your GEMINI_API_KEY
+npm run dev            # http://localhost:3001 (auto-restart via node --watch)
 ```
 
-### Run
+**2. Frontend** (terminal 2):
 
 ```bash
-npm run dev   # auto-restart on changes (node --watch)
-npm start     # production start
+cd frontend
+npm install
+npm run dev            # http://localhost:5173 (proxies /api → :3001)
 ```
 
-Server listens on `http://localhost:3001` by default.
+Open http://localhost:5173.
 
-### API
+## Production / single-port build
+
+In production the Express server serves the built frontend **and** the API on a
+single port. From the repo root:
+
+```bash
+npm run build   # installs deps and builds frontend → frontend/dist
+npm start       # serves everything on $PORT (default 3001)
+```
+
+## Deploying to Replit
+
+1. Add your keys under **Secrets** (not as a `PORT` — Replit injects that):
+   - `GEMINI_API_KEY` (required)
+   - `GITHUB_TOKEN` (optional, raises the GitHub rate limit)
+2. The included `.replit` builds the frontend and starts the server, which serves
+   both the UI and the API on one port. Click **Run**, or use
+   **Deploy → Autoscale** for a public URL.
+
+See the rate-limit warning above before sharing the live URL widely.
+
+## API
 
 `POST /api/roast`
 
@@ -65,16 +124,19 @@ Response:
 }
 ```
 
-Fetches the user's public profile + repositories from the GitHub API, summarizes
-them, and asks `gemini-2.5-flash` to generate a roast. The full `profile` payload
-is included so the frontend can render stats alongside the roast.
+Notes:
+
+- A user with **no public repos** returns `200` with `roast: null` (the frontend
+  shows a per-style empty state) — no Gemini call is made.
+- A non-existent user returns `404 { "error": "GitHub user not found" }`.
+- A Gemini rate limit returns `429` with the friendly "overheated" message.
 
 `GET /health` → `{ "status": "ok" }`
 
-### Environment variables
+## Environment variables
 
 | Variable         | Required | Description                                                        |
 | ---------------- | -------- | ------------------------------------------------------------------ |
-| `GEMINI_API_KEY` | Yes      | Google Gemini API key.                                             |
-| `PORT`           | No       | Server port (default `3001`).                                      |
+| `GEMINI_API_KEY` | Yes      | Google Gemini API key (free tier is rate-limited — see warning).   |
 | `GITHUB_TOKEN`   | No       | Raises GitHub rate limit (60/hr → 5000/hr). Public scopes suffice. |
+| `PORT`           | No       | Server port (default `3001`). On Replit this is injected for you.  |

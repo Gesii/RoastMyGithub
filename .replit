@@ -1,0 +1,18 @@
+entrypoint = "backend/src/server.js"
+modules = ["nodejs-20"]
+
+# Run button in the workspace: build the frontend, then start the server
+# (which serves both the API and the built frontend on one port).
+run = "npm run build && npm run start"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+deploymentTarget = "autoscale"
+build = ["sh", "-c", "npm run build"]
+run = ["sh", "-c", "npm run start"]
+
+[[ports]]
+localPort = 3001
+externalPort = 80

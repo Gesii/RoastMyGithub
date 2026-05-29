@@ -249,6 +249,24 @@ function readHistory() {
   }
 }
 
+const compactNumber = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+})
+function formatStat(n) {
+  return compactNumber.format(n ?? 0)
+}
+
+// Derive the headline profile stats from the API payload.
+function computeStats(profile) {
+  const repos = profile?.repositories ?? []
+  return {
+    repos: profile?.publicRepos ?? repos.length,
+    stars: repos.reduce((sum, r) => sum + (r.stars || 0), 0),
+    followers: profile?.followers ?? 0,
+  }
+}
+
 function App() {
   const [username, setUsername] = useState('')
   // `style` is the dropdown selection (used for the NEXT roast); `activeStyle`
@@ -289,7 +307,7 @@ function App() {
   // Prepend a successful roast (including its text) to history, de-duplicating
   // identical username+style entries and capping the list. The cached text lets
   // us re-display past roasts instantly without another AI call.
-  function saveToHistory(savedUsername, savedStyle, roastText) {
+  function saveToHistory(savedUsername, savedStyle, roastText, stats) {
     setHistory((prev) => {
       const deduped = prev.filter(
         (entry) =>
@@ -297,7 +315,7 @@ function App() {
           entry.style !== savedStyle,
       )
       const next = [
-        { username: savedUsername, style: savedStyle, roast: roastText },
+        { username: savedUsername, style: savedStyle, roast: roastText, stats },
         ...deduped,
       ].slice(0, HISTORY_LIMIT)
       try {
@@ -320,7 +338,12 @@ function App() {
     setUsername(entry.username)
     setStyle(entry.style)
     setActiveStyle(entry.style)
-    setResult({ kind: 'roast', text: entry.roast })
+    setResult({
+      kind: 'roast',
+      text: entry.roast,
+      username: entry.username,
+      stats: entry.stats,
+    })
     setCopied(false)
   }
 
@@ -364,8 +387,15 @@ function App() {
         return
       }
 
-      setResult({ kind: 'roast', text: data.roast })
-      saveToHistory(data.username || trimmed, targetStyle, data.roast)
+      const resolvedUsername = data.username || trimmed
+      const stats = computeStats(data.profile)
+      setResult({
+        kind: 'roast',
+        text: data.roast,
+        username: resolvedUsername,
+        stats,
+      })
+      saveToHistory(resolvedUsername, targetStyle, data.roast, stats)
     } catch (err) {
       setResult({ kind: 'error', message: err.message })
     } finally {
@@ -539,6 +569,34 @@ function App() {
         {!loading && result?.kind === 'error' && (
           <div className="rounded-lg border border-red-700 bg-red-950/90 px-4 py-3 text-red-200">
             {result.message}
+          </div>
+        )}
+
+        {!loading && hasRoast && result.stats && (
+          <div
+            className={`mb-3 flex items-stretch justify-around rounded-xl px-2 py-3 ${theme.card}`}
+          >
+            {[
+              { label: 'Repos', value: result.stats.repos },
+              { label: 'Stars', value: result.stats.stars },
+              { label: 'Followers', value: result.stats.followers },
+            ].map((stat, i) => (
+              <div key={stat.label} className="flex flex-1 items-center">
+                {i > 0 && (
+                  <span className="h-8 w-px self-center bg-current opacity-10" />
+                )}
+                <div className="flex-1 px-2 text-center">
+                  <div className={`text-2xl font-bold leading-none ${theme.accent}`}>
+                    {formatStat(stat.value)}
+                  </div>
+                  <div
+                    className={`mt-1 text-xs uppercase tracking-wider ${theme.subtitle}`}
+                  >
+                    {stat.label}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
